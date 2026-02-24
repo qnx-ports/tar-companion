@@ -1,0 +1,41 @@
+pkgname=tar
+pkgver=1.35
+pkgrel=0
+pkgdesc="Utility used to store, backup, and transport files"
+url="https://www.gnu.org/software/tar/"
+arch="all"
+depends="qnx-io-sock"
+makedepends="make qnx-io-sock-dev"
+license="GPL-3.0-or-later"
+subpackages="$pkgname-doc"
+#source="https://ftp.gnu.org/gnu/tar/tar-$pkgver.tar.xz
+source="https://mirror.csclub.uwaterloo.ca/gnu/tar/tar-$pkgver.tar.xz
+        dir_open.patch
+	fix-qnx-makedev.patch
+        "
+
+build() {
+   CHOST="$CHOST" \
+   ./configure \
+        --build=$CBUILD \
+        --host=$CHOST \
+        --prefix=/usr \
+        --without-xattrs \
+        --disable-rpath \
+        --disable-nls \
+        --without-selinux \
+        CFLAGS=-D_QNX_SOURCE \
+        LDFLAGS="-lm -lregex -lsocket -lgcc_s"
+
+    make
+}
+
+package() {
+    make DESTDIR="$pkgdir/" install
+}
+
+sha512sums="
+8b84ed661e6c878fa33eb5c1808d20351e6f40551ac63f96014fb0d0b9c72d5d94d8865d39e36bcb184fd250f84778a3b271bbd8bd2ceb69eece0c3568577510  tar-1.35.tar.xz
+c3f70e9b6aa4e6a360e5051f114b765d67104c7a3ee0eeadbb45568c245ab257488e045e586cee93102461af6d5a4aa72d210e40e4a94e51bd366f86de83c2fd  dir_open.patch
+bd35647d600b0f949faf57209ab4bcc73f4f2a97c6389fadacc73d33be212fcd7fd822df3d08f02871808bb6792bff705ad3712917d66d56ebd3d0c990d5301c  fix-qnx-makedev.patch
+"
